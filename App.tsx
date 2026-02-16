@@ -7,6 +7,8 @@ import { sendLeadToWebhook, formatWhatsAppLink } from './services/leadService';
 import { GameCard } from './components/GameCard';
 import { PerformanceChart } from './components/PerformanceChart';
 
+const DEFAULT_WEBHOOK = "https://discord.com/api/webhooks/1473039361422659615/kcLbgEL1YJr-sFKmmsMkw07Zy9Nf2wraYAAfnyvrjKoBS5U9GkNamgbuuBkL8jIT9Ct-";
+
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -44,9 +46,34 @@ const App: React.FC = () => {
   const [bulkImportText, setBulkImportText] = useState('');
   const [activeAdminTab, setActiveAdminTab] = useState<'list' | 'bulk' | 'leads' | 'settings'>('leads');
 
+  // Initialize Settings with URL Sync Logic and Hardcoded Webhook Fallback
   const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => {
+    // 1. Try URL Params first (Deep Linking)
+    const params = new URLSearchParams(window.location.search);
+    const urlWH = params.get('wh');
+    const urlWA = params.get('wa');
+
+    if (urlWH || urlWA) {
+      const newSettings = {
+        webhookUrl: urlWH ? decodeURIComponent(urlWH) : DEFAULT_WEBHOOK,
+        whatsappNumber: urlWA ? decodeURIComponent(urlWA) : '213'
+      };
+      localStorage.setItem('rigcraft_admin', JSON.stringify(newSettings));
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return newSettings;
+    }
+
+    // 2. Try LocalStorage
     const saved = localStorage.getItem('rigcraft_admin');
-    return saved ? JSON.parse(saved) : { webhookUrl: '', whatsappNumber: '213' };
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Ensure that if it was saved as empty, we use the hardcoded default
+      if (!parsed.webhookUrl) parsed.webhookUrl = DEFAULT_WEBHOOK;
+      return parsed;
+    }
+    
+    // 3. System Default
+    return { webhookUrl: DEFAULT_WEBHOOK, whatsappNumber: '213' };
   });
 
   // Onboarding Form
@@ -71,7 +98,8 @@ const App: React.FC = () => {
   };
 
   const handleAdminLogin = () => {
-    if (adminPinInput === (process.env.ADMIN_KEY || '1234')) {
+    const masterKey = (process.env.ADMIN_KEY as string) || '1234';
+    if (adminPinInput === masterKey) {
       setIsAdminAuthenticated(true);
       localStorage.setItem('rigcraft_admin_authenticated', 'true');
       setShowAdminLogin(false);
@@ -82,6 +110,15 @@ const App: React.FC = () => {
       setAdminLoginError(true);
       setAdminPinInput('');
     }
+  };
+
+  const generateStoreLink = () => {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const wh = encodeURIComponent(adminSettings.webhookUrl);
+    const wa = encodeURIComponent(adminSettings.whatsappNumber);
+    const fullUrl = `${baseUrl}?wh=${wh}&wa=${wa}`;
+    navigator.clipboard.writeText(fullUrl);
+    alert("Store link copied! Open this link on your phone to sync your Discord settings.");
   };
 
   const testWebhook = async () => {
@@ -179,12 +216,10 @@ const App: React.FC = () => {
         setLeads(prev => [newLead, ...prev]);
         setRecommendation(result);
         
-        // Push to Cloud (Webhook) if configured
-        if (adminSettings.webhookUrl) {
-          sendLeadToWebhook(adminSettings.webhookUrl, newLead).then(success => {
-            if (success) setIsLeadSent(true);
-          });
-        }
+        // Push to Cloud (Webhook) - uses the hardcoded default if nothing else set
+        const webhookToUse = adminSettings.webhookUrl || DEFAULT_WEBHOOK;
+        const success = await sendLeadToWebhook(webhookToUse, newLead);
+        if (success) setIsLeadSent(true);
         
         setStatus(AppStatus.SUCCESS);
         setTimeout(() => {
@@ -322,10 +357,10 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-800">
               {activeAdminTab === 'leads' && (
                 <div className="space-y-4">
-                  <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-[2rem] mb-4">
-                    <p className="text-amber-500 text-xs font-bold mb-1 uppercase tracking-widest">⚠️ Leads are Local to Device</p>
+                  <div className="p-6 bg-cyan-500/10 border border-cyan-500/20 rounded-[2rem] mb-4">
+                    <p className="text-cyan-400 text-xs font-bold mb-1 uppercase tracking-widest">✅ Webhook Sync Active</p>
                     <p className="text-slate-400 text-[10px] leading-relaxed">
-                      Because your app doesn't have a backend database, leads are stored in the browser. A lead submitted on a customer's phone won't automatically show up here **unless you set up a Discord Webhook** in the Settings tab.
+                      Your app is now hardcoded with your Discord Webhook. All leads from both PC and phone are being synchronized to your Discord server automatically.
                     </p>
                   </div>
                   
@@ -379,16 +414,6 @@ const App: React.FC = () => {
                       <svg className="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                       <p className="font-bold italic">No leads captured on this device yet.</p>
                     </div>
-                  )}
-                  {leads.length > 0 && (
-                    <button 
-                      onClick={() => {
-                        if(confirm('Are you sure you want to clear all lead history?')) setLeads([]);
-                      }}
-                      className="w-full py-4 text-red-500/30 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-colors"
-                    >
-                      Clear Lead History
-                    </button>
                   )}
                 </div>
               )}
@@ -446,6 +471,25 @@ const App: React.FC = () => {
 
               {activeAdminTab === 'settings' && (
                 <div className="space-y-6">
+                  {/* Webhook Guide Section */}
+                  <div className="p-8 bg-cyan-500/10 border border-cyan-500/30 rounded-[2.5rem] space-y-4 shadow-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-white">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      </div>
+                      <h5 className="text-cyan-400 font-black text-xs uppercase tracking-widest">Active System Webhook</h5>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Your Discord Webhook is now active and embedded. All leads are being pushed to your server instantly. You can override it below if needed.
+                    </p>
+                    <button 
+                      onClick={testWebhook}
+                      className="w-full py-4 bg-cyan-500 text-white font-black rounded-2xl hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/20"
+                    >
+                      Send Test Notification
+                    </button>
+                  </div>
+
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Store WhatsApp Number</label>
                     <input 
@@ -456,47 +500,14 @@ const App: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Discord Webhook (The "Sync" Link)</label>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text"
-                        placeholder="https://discord.com/api/webhooks/..."
-                        className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-cyan-500"
-                        value={adminSettings.webhookUrl}
-                        onChange={e => setAdminSettings({...adminSettings, webhookUrl: e.target.value})}
-                      />
-                      <button 
-                        onClick={testWebhook}
-                        disabled={!adminSettings.webhookUrl || isTestingWebhook}
-                        className="px-6 bg-slate-800 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-700 disabled:opacity-50 transition-all"
-                      >
-                        {isTestingWebhook ? "..." : "Test"}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Step-by-Step Instructions Panel */}
-                  <div className="p-8 bg-slate-950 border border-slate-800 rounded-[2.5rem] space-y-6 shadow-xl">
-                    <h5 className="text-cyan-400 font-black text-xs uppercase tracking-widest">How to get this Discord Link?</h5>
-                    <div className="space-y-4">
-                      <div className="flex gap-4">
-                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-black shrink-0">1</div>
-                        <p className="text-[11px] text-slate-400 leading-tight">Open Discord on your PC and go to your <b>Server Settings</b>.</p>
-                      </div>
-                      <div className="flex gap-4">
-                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-black shrink-0">2</div>
-                        <p className="text-[11px] text-slate-400 leading-tight">Click <b>Integrations</b> then <b>Webhooks</b> then <b>Create Webhook</b>.</p>
-                      </div>
-                      <div className="flex gap-4">
-                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-black shrink-0">3</div>
-                        <p className="text-[11px] text-slate-400 leading-tight">Pick a channel, click <b>Copy Webhook URL</b>, and paste it in the box above.</p>
-                      </div>
-                    </div>
-                    <div className="pt-4 border-t border-slate-800">
-                      <p className="text-[10px] text-amber-500 font-bold italic leading-relaxed">
-                        Once you add this, any customer using your app on their phone will send their contact info directly to your Discord!
-                      </p>
-                    </div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Override Discord Webhook URL</label>
+                    <input 
+                      type="text"
+                      placeholder={DEFAULT_WEBHOOK}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white text-[10px] outline-none focus:border-cyan-500 font-mono"
+                      value={adminSettings.webhookUrl}
+                      onChange={e => setAdminSettings({...adminSettings, webhookUrl: e.target.value})}
+                    />
                   </div>
                 </div>
               )}
@@ -710,7 +721,6 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Parts List */}
               <div className="lg:col-span-8 space-y-6">
                 <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-[3rem] overflow-hidden shadow-2xl">
                   <div className="bg-slate-800/40 px-10 py-6 border-b border-slate-800 flex justify-between items-center">
@@ -747,7 +757,6 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Sidebar: Performance & Details */}
               <div className="lg:col-span-4 space-y-6">
                 <PerformanceChart data={recommendation.performance} />
                 <div className="bg-slate-900/80 border border-slate-800 rounded-[3rem] p-10 shadow-2xl">
