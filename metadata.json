@@ -1,0 +1,5 @@
+{
+  "name": "RigCraft AI",
+  "description": "An AI-powered PC building assistant that recommends the perfect hardware configuration based on your favorite games and budget constraints.",
+  "requestFramePermissions": []
+}
