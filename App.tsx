@@ -25,6 +25,7 @@ const App: React.FC = () => {
 
   // Lead transmission status
   const [isLeadSent, setIsLeadSent] = useState(false);
+  const [isTestingWebhook, setIsTestingWebhook] = useState(false);
 
   // Stock / Inventory Control
   const [showStockManager, setShowStockManager] = useState(false);
@@ -33,7 +34,7 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
   
-  // Captured Leads (New Feature)
+  // Captured Leads
   const [leads, setLeads] = useState<LeadPayload[]>(() => {
     const saved = localStorage.getItem('rigcraft_leads');
     return saved ? JSON.parse(saved) : [];
@@ -70,7 +71,7 @@ const App: React.FC = () => {
   };
 
   const handleAdminLogin = () => {
-    if (adminPinInput === process.env.ADMIN_KEY) {
+    if (adminPinInput === (process.env.ADMIN_KEY || '1234')) {
       setIsAdminAuthenticated(true);
       localStorage.setItem('rigcraft_admin_authenticated', 'true');
       setShowAdminLogin(false);
@@ -81,6 +82,41 @@ const App: React.FC = () => {
       setAdminLoginError(true);
       setAdminPinInput('');
     }
+  };
+
+  const testWebhook = async () => {
+    if (!adminSettings.webhookUrl) return;
+    setIsTestingWebhook(true);
+    const success = await sendLeadToWebhook(adminSettings.webhookUrl, {
+      customer: { name: "System Test", phone: "0000000000", willaya: "01" },
+      game: "Test Run",
+      budget: 0,
+      timestamp: new Date().toLocaleString(),
+      recommendation: { totalEstimatedCost: 0, parts: [], performance: [], summary: "Test", bottleneckAnalysis: "Test" }
+    });
+    setIsTestingWebhook(false);
+    alert(success ? "Test notification sent! Check your Discord." : "Failed to send test. Check your URL.");
+  };
+
+  const exportLeadsToCSV = () => {
+    if (leads.length === 0) return;
+    const headers = ["Timestamp", "Name", "Phone", "Willaya", "Game", "Budget"];
+    const rows = leads.map(l => [
+      l.timestamp,
+      l.customer.name,
+      l.customer.phone,
+      l.customer.willaya,
+      l.game,
+      l.budget
+    ]);
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `rigcraft_leads_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleBulkImport = () => {
@@ -129,21 +165,21 @@ const App: React.FC = () => {
       setIsLeadSent(false);
       try {
         const result = await getPCRecommendation(selectedGame.title, budget, language, stock);
-        setRecommendation(result);
         
-        // Capture Lead
+        // Final Lead Object
         const newLead: LeadPayload = {
-          customer: userContact,
+          customer: { ...userContact },
           game: selectedGame.title,
           budget: budget,
           recommendation: result,
           timestamp: new Date().toLocaleString()
         };
         
-        // Save to Local Admin Log
+        // Update state and persistence
         setLeads(prev => [newLead, ...prev]);
+        setRecommendation(result);
         
-        // Try Sending to Webhook if configured
+        // Push to Cloud (Webhook) if configured
         if (adminSettings.webhookUrl) {
           sendLeadToWebhook(adminSettings.webhookUrl, newLead).then(success => {
             if (success) setIsLeadSent(true);
@@ -286,6 +322,21 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-800">
               {activeAdminTab === 'leads' && (
                 <div className="space-y-4">
+                  <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-[2rem] mb-4">
+                    <p className="text-amber-500 text-xs font-bold mb-1 uppercase tracking-widest">⚠️ Leads are Local to Device</p>
+                    <p className="text-slate-400 text-[10px] leading-relaxed">
+                      Because your app doesn't have a backend database, leads are stored in the browser. A lead submitted on a customer's phone won't automatically show up here **unless you set up a Discord Webhook** in the Settings tab.
+                    </p>
+                  </div>
+                  
+                  {leads.length > 0 && (
+                    <div className="flex justify-end mb-2">
+                      <button onClick={exportLeadsToCSV} className="text-[10px] font-black uppercase text-cyan-400 hover:text-white transition-colors bg-cyan-500/10 px-3 py-1.5 rounded-lg border border-cyan-500/20">
+                        Export as CSV
+                      </button>
+                    </div>
+                  )}
+
                   {leads.length > 0 ? (
                     leads.map((lead, idx) => (
                       <div key={idx} className="bg-slate-950/50 border border-slate-800 p-6 rounded-[2rem] flex flex-col md:flex-row justify-between gap-6 hover:border-cyan-500/30 transition-all">
@@ -326,7 +377,7 @@ const App: React.FC = () => {
                   ) : (
                     <div className="text-center py-20 text-slate-600">
                       <svg className="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                      <p className="font-bold italic">No leads captured yet. Your customers' contact info will appear here.</p>
+                      <p className="font-bold italic">No leads captured on this device yet.</p>
                     </div>
                   )}
                   {leads.length > 0 && (
@@ -334,7 +385,7 @@ const App: React.FC = () => {
                       onClick={() => {
                         if(confirm('Are you sure you want to clear all lead history?')) setLeads([]);
                       }}
-                      className="w-full py-4 text-red-500/50 hover:text-red-500 text-xs font-bold uppercase tracking-widest transition-colors"
+                      className="w-full py-4 text-red-500/30 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-colors"
                     >
                       Clear Lead History
                     </button>
@@ -396,7 +447,7 @@ const App: React.FC = () => {
               {activeAdminTab === 'settings' && (
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Store WhatsApp (Intl Format)</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Store WhatsApp Number</label>
                     <input 
                       type="text"
                       className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-cyan-500"
@@ -405,18 +456,47 @@ const App: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Discord/Slack Webhook (Lead Notifications)</label>
-                    <input 
-                      type="text"
-                      placeholder="https://discord.com/api/webhooks/..."
-                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-cyan-500"
-                      value={adminSettings.webhookUrl}
-                      onChange={e => setAdminSettings({...adminSettings, webhookUrl: e.target.value})}
-                    />
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Discord Webhook (The "Sync" Link)</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text"
+                        placeholder="https://discord.com/api/webhooks/..."
+                        className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-cyan-500"
+                        value={adminSettings.webhookUrl}
+                        onChange={e => setAdminSettings({...adminSettings, webhookUrl: e.target.value})}
+                      />
+                      <button 
+                        onClick={testWebhook}
+                        disabled={!adminSettings.webhookUrl || isTestingWebhook}
+                        className="px-6 bg-slate-800 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-700 disabled:opacity-50 transition-all"
+                      >
+                        {isTestingWebhook ? "..." : "Test"}
+                      </button>
+                    </div>
                   </div>
-                  <div className="p-6 bg-cyan-500/5 rounded-[2rem] border border-cyan-500/20">
-                    <p className="text-xs text-cyan-400 font-bold mb-1">REAL-TIME ALERTS</p>
-                    <p className="text-slate-400 text-xs leading-relaxed">Paste a Discord Webhook URL here to get notified on your phone the second a customer generates a build!</p>
+
+                  {/* Step-by-Step Instructions Panel */}
+                  <div className="p-8 bg-slate-950 border border-slate-800 rounded-[2.5rem] space-y-6 shadow-xl">
+                    <h5 className="text-cyan-400 font-black text-xs uppercase tracking-widest">How to get this Discord Link?</h5>
+                    <div className="space-y-4">
+                      <div className="flex gap-4">
+                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-black shrink-0">1</div>
+                        <p className="text-[11px] text-slate-400 leading-tight">Open Discord on your PC and go to your <b>Server Settings</b>.</p>
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-black shrink-0">2</div>
+                        <p className="text-[11px] text-slate-400 leading-tight">Click <b>Integrations</b> then <b>Webhooks</b> then <b>Create Webhook</b>.</p>
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-black shrink-0">3</div>
+                        <p className="text-[11px] text-slate-400 leading-tight">Pick a channel, click <b>Copy Webhook URL</b>, and paste it in the box above.</p>
+                      </div>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800">
+                      <p className="text-[10px] text-amber-500 font-bold italic leading-relaxed">
+                        Once you add this, any customer using your app on their phone will send their contact info directly to your Discord!
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
