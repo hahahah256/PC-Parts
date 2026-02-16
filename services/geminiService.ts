@@ -2,7 +2,31 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PCRecommendation, Language, StockItem } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const SCREENSHOT_CATALOG = `
+AVAILABLE BUILDS & PARTS (MANDATORY RESTRICTION):
+You can ONLY use parts from these 3 specific configurations found in our physical catalog:
+
+BUILD 1: AMD RYZEN APU BUILD (Price: 65,000 DA)
+- CPU: AMD Ryzen 5 5600G (6 Cores)
+- Motherboard: MB B550
+- RAM: 16GB DDR4 3200MHz
+- Storage: 256GB SATA SSD
+- GPU: Integrated Radeon Graphics (APU)
+
+BUILD 2: AMD RYZEN/RADEON BUILD (Price: 65,000 DA)
+- CPU: AMD Ryzen 3 3200G (4 Cores)
+- Motherboard: MB B450
+- RAM: 16GB DDR4 3200MHz
+- GPU: AMD Radeon RX 580 8GB
+- Storage: 256GB SATA SSD
+
+BUILD 3: INTEL/NVIDIA BUILD (Price: 64,000 DA)
+- CPU: Intel Core i5-7th Gen (4 Cores)
+- Motherboard: MB H110
+- RAM: 16GB DDR4 3200MHz
+- GPU: NVIDIA GTX 1650 4GB
+- Storage: 256GB SATA SSD
+`;
 
 export const getPCRecommendation = async (
   gameTitle: string, 
@@ -10,20 +34,26 @@ export const getPCRecommendation = async (
   language: Language,
   stockItems: StockItem[]
 ): Promise<PCRecommendation> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  // Custom stock from admin panel still takes priority if provided, 
+  // otherwise we use the strict Screenshot Catalog.
   const stockContext = stockItems.length > 0 
-    ? `INVENTORY PRIORITY: The seller has the following parts in stock. Use them in the recommendation IF they are suitable for the ${budget} DZD budget and the game "${gameTitle}": ${stockItems.map(s => `[${s.category}: ${s.name}]`).join(', ')}.`
-    : '';
+    ? `INVENTORY: ${stockItems.map(s => `[${s.category}: ${s.name}]`).join(', ')}.`
+    : SCREENSHOT_CATALOG;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Act as a PC hardware expert for the Algerian market. Recommend a complete PC build for "${gameTitle}" with a budget of ${budget} DZD. 
+    contents: `Act as a PC hardware expert. A customer wants a PC for "${gameTitle}" with a budget of ${budget} DZD.
     
-    Output Language: ${language === 'ar' ? 'Arabic (Modern Standard)' : language === 'fr' ? 'French' : 'English'}.
-    All prices MUST be in DZD.
-    
+    CRITICAL RULE: You MUST ONLY recommend components that exist in the following inventory:
     ${stockContext}
     
-    Ensure components are currently available in North Africa (Algeria). Ensure compatibility between motherboard, CPU, and RAM.`,
+    Instructions:
+    1. If the budget is around 65,000 DA, select the BUILD from the catalog that best runs "${gameTitle}".
+    2. If the user's budget is lower than the catalog prices, recommend the most affordable parts from the catalog but warn them about the price.
+    3. Output Language: ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}.
+    4. All prices must be in DZD.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -34,10 +64,10 @@ export const getPCRecommendation = async (
             items: {
               type: Type.OBJECT,
               properties: {
-                category: { type: Type.STRING, description: "Component type (e.g., CPU, GPU, RAM)" },
-                name: { type: Type.STRING, description: "Specific model name" },
-                estimatedPrice: { type: Type.NUMBER, description: "Price in DZD" },
-                reasoning: { type: Type.STRING, description: "Why this part is optimal for this build" }
+                category: { type: Type.STRING },
+                name: { type: Type.STRING },
+                estimatedPrice: { type: Type.NUMBER },
+                reasoning: { type: Type.STRING }
               },
               required: ["category", "name", "estimatedPrice", "reasoning"]
             }
@@ -66,7 +96,6 @@ export const getPCRecommendation = async (
   try {
     return JSON.parse(response.text || "{}") as PCRecommendation;
   } catch (error) {
-    console.error("Failed to parse Gemini response", error);
-    throw new Error("Invalid hardware recommendation generated.");
+    throw new Error("Failed to parse hardware recommendation.");
   }
 };
