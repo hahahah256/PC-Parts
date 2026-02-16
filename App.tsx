@@ -10,7 +10,7 @@ import { PerformanceChart } from './components/PerformanceChart';
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [budget, setBudget] = useState<number>(140000);
+  const [budget, setBudget] = useState<number>(65000);
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [recommendation, setRecommendation] = useState<PCRecommendation | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,9 +32,16 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('rigcraft_stock');
     return saved ? JSON.parse(saved) : [];
   });
+  
+  // Captured Leads (New Feature)
+  const [leads, setLeads] = useState<LeadPayload[]>(() => {
+    const saved = localStorage.getItem('rigcraft_leads');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [newStockItem, setNewStockItem] = useState({ category: '', name: '' });
   const [bulkImportText, setBulkImportText] = useState('');
-  const [activeAdminTab, setActiveAdminTab] = useState<'list' | 'bulk' | 'settings'>('list');
+  const [activeAdminTab, setActiveAdminTab] = useState<'list' | 'bulk' | 'leads' | 'settings'>('leads');
 
   const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => {
     const saved = localStorage.getItem('rigcraft_admin');
@@ -51,7 +58,8 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('rigcraft_admin', JSON.stringify(adminSettings));
     localStorage.setItem('rigcraft_stock', JSON.stringify(stock));
-  }, [adminSettings, stock]);
+    localStorage.setItem('rigcraft_leads', JSON.stringify(leads));
+  }, [adminSettings, stock, leads]);
 
   const handleAdminAccess = () => {
     if (isAdminAuthenticated) {
@@ -122,19 +130,27 @@ const App: React.FC = () => {
       try {
         const result = await getPCRecommendation(selectedGame.title, budget, language, stock);
         setRecommendation(result);
-        setStatus(AppStatus.SUCCESS);
-        const lead: LeadPayload = {
+        
+        // Capture Lead
+        const newLead: LeadPayload = {
           customer: userContact,
           game: selectedGame.title,
           budget: budget,
           recommendation: result,
           timestamp: new Date().toLocaleString()
         };
+        
+        // Save to Local Admin Log
+        setLeads(prev => [newLead, ...prev]);
+        
+        // Try Sending to Webhook if configured
         if (adminSettings.webhookUrl) {
-          sendLeadToWebhook(adminSettings.webhookUrl, lead).then(success => {
+          sendLeadToWebhook(adminSettings.webhookUrl, newLead).then(success => {
             if (success) setIsLeadSent(true);
           });
         }
+        
+        setStatus(AppStatus.SUCCESS);
         setTimeout(() => {
           document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
         }, 150);
@@ -173,15 +189,18 @@ const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <div 
               onClick={handleAdminAccess} 
-              className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-lg transition-all cursor-pointer ${
+              className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-lg transition-all cursor-pointer group ${
                 isAdminAuthenticated ? 'bg-cyan-500 shadow-cyan-500/20' : 'bg-slate-800 hover:bg-slate-700'
               }`}
             >
               {isAdminAuthenticated ? (
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <div className="relative">
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {leads.length > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-cyan-500 rounded-full"></span>}
+                </div>
               ) : (
                 <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -214,7 +233,7 @@ const App: React.FC = () => {
               </svg>
             </div>
             <h2 className="text-2xl font-black text-white text-center mb-2">Creator Login</h2>
-            <p className="text-slate-500 text-center text-sm mb-8">Enter your secret key to access inventory management.</p>
+            <p className="text-slate-500 text-center text-sm mb-8">Enter your secret key to access your leads and dashboard.</p>
             <div className="space-y-4">
               <input 
                 type="password"
@@ -230,7 +249,7 @@ const App: React.FC = () => {
                 onClick={handleAdminLogin}
                 className="w-full py-4 bg-cyan-500 text-white font-black rounded-2xl hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/20"
               >
-                Access Dashboard
+                Access Leads
               </button>
               <button 
                 onClick={() => setShowAdminLogin(false)}
@@ -243,17 +262,20 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Stock Manager Modal */}
+      {/* Stock/Lead Manager Modal */}
       {showStockManager && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-[3rem] p-10 shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-[3rem] p-10 shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex justify-between items-start mb-8">
               <div>
-                <h2 className="text-3xl font-black text-white">Inventory Master</h2>
-                <div className="flex gap-4 mt-4">
-                  <button onClick={() => setActiveAdminTab('list')} className={`text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-all ${activeAdminTab === 'list' ? 'border-cyan-500 text-white' : 'border-transparent text-slate-500'}`}>Current Stock</button>
+                <h2 className="text-3xl font-black text-white">Store Dashboard</h2>
+                <div className="flex flex-wrap gap-4 mt-4">
+                  <button onClick={() => setActiveAdminTab('leads')} className={`text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-all ${activeAdminTab === 'leads' ? 'border-cyan-500 text-white' : 'border-transparent text-slate-500'}`}>
+                    Captured Leads {leads.length > 0 && `(${leads.length})`}
+                  </button>
+                  <button onClick={() => setActiveAdminTab('list')} className={`text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-all ${activeAdminTab === 'list' ? 'border-cyan-500 text-white' : 'border-transparent text-slate-500'}`}>Stock Inventory</button>
                   <button onClick={() => setActiveAdminTab('bulk')} className={`text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-all ${activeAdminTab === 'bulk' ? 'border-cyan-500 text-white' : 'border-transparent text-slate-500'}`}>Bulk Import</button>
-                  <button onClick={() => setActiveAdminTab('settings')} className={`text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-all ${activeAdminTab === 'settings' ? 'border-cyan-500 text-white' : 'border-transparent text-slate-500'}`}>Store Settings</button>
+                  <button onClick={() => setActiveAdminTab('settings')} className={`text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-all ${activeAdminTab === 'settings' ? 'border-cyan-500 text-white' : 'border-transparent text-slate-500'}`}>Admin Settings</button>
                 </div>
               </div>
               <button onClick={() => setShowStockManager(false)} className="bg-slate-800 p-2 rounded-xl text-slate-500 hover:text-white transition-colors">
@@ -262,6 +284,64 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-800">
+              {activeAdminTab === 'leads' && (
+                <div className="space-y-4">
+                  {leads.length > 0 ? (
+                    leads.map((lead, idx) => (
+                      <div key={idx} className="bg-slate-950/50 border border-slate-800 p-6 rounded-[2rem] flex flex-col md:flex-row justify-between gap-6 hover:border-cyan-500/30 transition-all">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white font-black text-lg">{lead.customer.name}</span>
+                            <span className="px-2 py-0.5 bg-slate-800 text-[10px] text-slate-400 rounded-md font-bold uppercase">{lead.timestamp}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-sm">
+                            <span className="text-cyan-400 font-mono font-bold tracking-wider">{lead.customer.phone}</span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400">{ALGERIA_WILLAYAS.find(w => w.id === lead.customer.willaya)?.name || lead.customer.willaya}</span>
+                          </div>
+                          <div className="mt-3 text-xs text-slate-500">
+                            Requested Build for: <span className="text-white font-bold">{lead.game}</span> @ <span className="text-white font-bold">{lead.budget.toLocaleString()} DA</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => {
+                              navigator.clipboard.writeText(lead.customer.phone);
+                              alert('Phone number copied to clipboard!');
+                            }}
+                            className="p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all group"
+                            title="Copy Phone Number"
+                          >
+                            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
+                          </button>
+                          <a 
+                            href={`tel:${lead.customer.phone}`}
+                            className="p-3 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-xl transition-all"
+                          >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                          </a>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-20 text-slate-600">
+                      <svg className="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                      <p className="font-bold italic">No leads captured yet. Your customers' contact info will appear here.</p>
+                    </div>
+                  )}
+                  {leads.length > 0 && (
+                    <button 
+                      onClick={() => {
+                        if(confirm('Are you sure you want to clear all lead history?')) setLeads([]);
+                      }}
+                      className="w-full py-4 text-red-500/50 hover:text-red-500 text-xs font-bold uppercase tracking-widest transition-colors"
+                    >
+                      Clear Lead History
+                    </button>
+                  )}
+                </div>
+              )}
+
               {activeAdminTab === 'list' && (
                 <div className="space-y-6">
                   <div className="flex gap-3">
@@ -291,7 +371,6 @@ const App: React.FC = () => {
                         </button>
                       </div>
                     ))}
-                    {stock.length === 0 && <p className="col-span-2 text-center py-12 text-slate-600 italic">No parts in inventory yet.</p>}
                   </div>
                 </div>
               )}
@@ -329,14 +408,15 @@ const App: React.FC = () => {
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Discord/Slack Webhook (Lead Notifications)</label>
                     <input 
                       type="text"
+                      placeholder="https://discord.com/api/webhooks/..."
                       className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-cyan-500"
                       value={adminSettings.webhookUrl}
                       onChange={e => setAdminSettings({...adminSettings, webhookUrl: e.target.value})}
                     />
                   </div>
                   <div className="p-6 bg-cyan-500/5 rounded-[2rem] border border-cyan-500/20">
-                    <p className="text-xs text-cyan-400 font-bold mb-1">PRO TIP</p>
-                    <p className="text-slate-400 text-xs leading-relaxed">Configuring a webhook allows you to receive instant notifications in your team chat whenever a customer generates a build.</p>
+                    <p className="text-xs text-cyan-400 font-bold mb-1">REAL-TIME ALERTS</p>
+                    <p className="text-slate-400 text-xs leading-relaxed">Paste a Discord Webhook URL here to get notified on your phone the second a customer generates a build!</p>
                   </div>
                 </div>
               )}
@@ -460,7 +540,7 @@ const App: React.FC = () => {
                   <input 
                     type="range" 
                     min="40000" 
-                    max="1000000" 
+                    max="200000" 
                     step="5000"
                     value={budget}
                     onChange={(e) => setBudget(Number(e.target.value))}
@@ -468,7 +548,7 @@ const App: React.FC = () => {
                   />
                   <div className="flex justify-between mt-4">
                     <span className="text-[10px] font-bold text-slate-700 uppercase">40K {t.currency}</span>
-                    <span className="text-[10px] font-bold text-slate-700 uppercase">1M {t.currency}</span>
+                    <span className="text-[10px] font-bold text-slate-700 uppercase">200K {t.currency}</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -483,10 +563,10 @@ const App: React.FC = () => {
                       }`}
                     >
                       {isRTL ? {
-                        'Entry': 'اقتصادي',
-                        'Mid': 'متوسط',
-                        'High': 'قوي',
-                        'Ultra': 'خارق'
+                        'Budget': 'اقتصادي',
+                        'Standard': 'متوسط',
+                        'Advanced': 'قوي',
+                        'Pro': 'خارق'
                       }[range.label] : range.label} ({range.value / 1000}K)
                     </button>
                   ))}
