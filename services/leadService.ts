@@ -8,18 +8,19 @@ export const sendLeadToWebhook = async (url: string, payload: LeadPayload): Prom
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        content: "🚀 **New PC Build Lead Received!**",
+        content: "🚀 **New PC Build Request!**",
         embeds: [{
-          title: `Build for ${payload.customer.name}`,
+          title: `Build Configuration for ${payload.customer.name}`,
           color: 0x06b6d4,
           fields: [
-            { name: "Customer", value: `${payload.customer.name} (${payload.customer.phone})`, inline: true },
-            { name: "Location", value: `Willaya ${payload.customer.willaya}`, inline: true },
-            { name: "Game", value: payload.game, inline: true },
-            { name: "Budget", value: `${payload.budget.toLocaleString()} DZD`, inline: true },
-            { name: "Parts", value: payload.recommendation.parts.map(p => `- ${p.category}: ${p.name}`).join('\n') }
+            { name: "👤 Customer Name", value: payload.customer.name, inline: true },
+            { name: "📞 Phone Number", value: `**${payload.customer.phone}**`, inline: true },
+            { name: "📍 Location", value: `Wilaya ${payload.customer.willaya}`, inline: true },
+            { name: "🎮 Target Game", value: payload.game, inline: true },
+            { name: "💰 Target Budget", value: `${payload.budget.toLocaleString()} DZD`, inline: true },
+            { name: "🖥️ Configuration Details", value: payload.recommendation.parts.map(p => `**${p.category}**: ${p.name}`).join('\n') }
           ],
-          footer: { text: `Sent at ${payload.timestamp}` }
+          footer: { text: `Pc-Club Parts • Received at ${payload.timestamp}` }
         }]
       })
     });
