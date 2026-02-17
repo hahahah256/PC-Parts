@@ -2,30 +2,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PCRecommendation, Language, StockItem } from "../types";
 
-const SCREENSHOT_CATALOG = `
-AVAILABLE BUILDS & PARTS (MANDATORY RESTRICTION):
-You can ONLY use parts from these 3 specific configurations found in our physical catalog:
-
-BUILD 1: AMD RYZEN APU BUILD (Price: 65,000 DA)
-- CPU: AMD Ryzen 5 5600G (6 Cores)
-- Motherboard: MB B550
-- RAM: 16GB DDR4 3200MHz
-- Storage: 256GB SATA SSD
-- GPU: Integrated Radeon Graphics (APU)
-
-BUILD 2: AMD RYZEN/RADEON BUILD (Price: 65,000 DA)
-- CPU: AMD Ryzen 3 3200G (4 Cores)
-- Motherboard: MB B450
-- RAM: 16GB DDR4 3200MHz
-- GPU: AMD Radeon RX 580 8GB
-- Storage: 256GB SATA SSD
-
-BUILD 3: INTEL/NVIDIA BUILD (Price: 64,000 DA)
-- CPU: Intel Core i5-7th Gen (4 Cores)
-- Motherboard: MB H110
-- RAM: 16GB DDR4 3200MHz
-- GPU: NVIDIA GTX 1650 4GB
-- Storage: 256GB SATA SSD
+const ALGERIAN_MARKET_RULES = `
+MARKET CONTEXT (ALGERIA):
+- Mid-range builds (RTX 4060) usually cost between 130,000 DA and 180,000 DA.
+- High-end builds (RTX 4070/4080) cost 200,000 DA to 350,000 DA.
+- Ultra builds (RTX 4090) exceed 450,000 DA.
+- Recommended brands: ASUS, MSI, Gigabyte, Corsair, Kingston (widely available).
+- For lower budgets (65k), prioritize AMD APUs or Used GPU builds (RX 580).
 `;
 
 export const getPCRecommendation = async (
@@ -36,24 +19,19 @@ export const getPCRecommendation = async (
 ): Promise<PCRecommendation> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // Custom stock from admin panel still takes priority if provided, 
-  // otherwise we use the strict Screenshot Catalog.
-  const stockContext = stockItems.length > 0 
-    ? `INVENTORY: ${stockItems.map(s => `[${s.category}: ${s.name}]`).join(', ')}.`
-    : SCREENSHOT_CATALOG;
-
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Act as a PC hardware expert. A customer wants a PC for "${gameTitle}" with a budget of ${budget} DZD.
+    contents: `Act as a PC Hardware Consultant for "Pc-Club Parts". 
+    A client wants a machine optimized for "${gameTitle}" with a strict budget of ${budget} DZD.
     
-    CRITICAL RULE: You MUST ONLY recommend components that exist in the following inventory:
-    ${stockContext}
+    GUIDELINES:
+    1. Provide a realistic part list available in the Algerian market.
+    2. Budget is ${budget} DA. Do not exceed this by more than 5%.
+    3. For competitive games (Valorant, CS2), prioritize CPU and High-Refresh capability.
+    4. For AAA games (Cyberpunk, Elden Ring), prioritize GPU and VRAM.
+    5. Output Language: ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}.
     
-    Instructions:
-    1. If the budget is around 65,000 DA, select the BUILD from the catalog that best runs "${gameTitle}".
-    2. If the user's budget is lower than the catalog prices, recommend the most affordable parts from the catalog but warn them about the price.
-    3. Output Language: ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}.
-    4. All prices must be in DZD.`,
+    ${ALGERIAN_MARKET_RULES}`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -96,6 +74,6 @@ export const getPCRecommendation = async (
   try {
     return JSON.parse(response.text || "{}") as PCRecommendation;
   } catch (error) {
-    throw new Error("Failed to parse hardware recommendation.");
+    throw new Error("Hardware calculation engine failed.");
   }
 };
