@@ -3,10 +3,46 @@ import { Game, Language } from './types';
 
 export const POPULAR_GAMES: Game[] = [
   { 
+    id: 'fortnite', 
+    title: 'Fortnite', 
+    image: 'https://i.ytimg.com/vi/adGdyCdvKz4/maxresdefault.jpg', 
+    genre: 'Battle Royale' 
+  },
+  { 
+    id: 'valorant', 
+    title: 'Valorant', 
+    image: 'https://static.wikia.nocookie.net/valorant/images/6/67/VALORANT.jpg/revision/latest?cb=20230521024215&path-prefix=th', 
+    genre: 'Tactical Shooter' 
+  },
+  { 
+    id: 'cs2', 
+    title: 'Counter-Strike 2', 
+    image: 'https://cdn.akamai.steamstatic.com/steam/apps/730/capsule_616x353.jpg?t=1698860631', 
+    genre: 'Tactical Shooter' 
+  },
+  { 
+    id: 'lol', 
+    title: 'League of Legends', 
+    image: 'https://www.exitlag.com/blog/wp-content/uploads/2024/10/league-of-legends-download-1.webp', 
+    genre: 'MOBA' 
+  },
+  { 
+    id: 'fc25', 
+    title: 'EA Sports FC 25', 
+    image: 'https://i.ytimg.com/vi/QrID0EA3hhI/maxresdefault.jpg', 
+    genre: 'Sports' 
+  },
+  { 
     id: 'gtav', 
     title: 'Grand Theft Auto V', 
     image: 'https://wallpapers.com/images/featured/grand-theft-auto-v-naej4yiap4gnxh2o.jpg',  
     genre: 'Action/Open World' 
+  },
+  { 
+    id: 'wukong', 
+    title: 'Black Myth: Wukong', 
+    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2358720/header.jpg?t=1724119159', 
+    genre: 'Action RPG' 
   },
   { 
     id: 'rdr2', 
@@ -21,10 +57,46 @@ export const POPULAR_GAMES: Game[] = [
     genre: 'Action RPG' 
   },
   { 
+    id: 'helldivers2', 
+    title: 'Helldivers 2', 
+    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/553850/header.jpg?t=1720689945', 
+    genre: 'Co-op Shooter' 
+  },
+  { 
     id: 'cyberpunk', 
     title: 'Cyberpunk 2077', 
     image: 'https://cdn1.epicgames.com/offer/77f2b98e2cef40c8a7437518bf420e47/EGS_Cyberpunk2077_CDPROJEKTRED_S1_03_2560x1440-359e77d3cd0a40aebf3bbc130d14c5c7', 
     genre: 'Open World RPG' 
+  },
+  { 
+    id: 'minecraft', 
+    title: 'Minecraft', 
+    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/Minecraft_2024_cover_art.png/250px-Minecraft_2024_cover_art.png', 
+    genre: 'Sandbox' 
+  },
+  { 
+    id: 'roblox', 
+    title: 'Roblox', 
+    image: 'https://images.tynker.com/blog/wp-content/uploads/20250401220809/robloxxjpg-1.jpg', 
+    genre: 'Sandbox/Platform' 
+  },
+  { 
+    id: 'apex', 
+    title: 'Apex Legends', 
+    image: 'https://www.nintendo.com/eu/media/images/assets/nintendo_switch_games/apexlegends/16x9_ApexLegends_image1600w.jpg', 
+    genre: 'Battle Royale' 
+  },
+  { 
+    id: 'forza5', 
+    title: 'Forza Horizon 5', 
+    image: 'https://store-images.s-microsoft.com/image/apps.33953.13806078025361171.9723cf5e-1e29-4d9d-ad0a-cc37a95bb75d.afabb748-2c30-4a7e-8072-2809a222192d?q=90&w=480&h=270', 
+    genre: 'Racing' 
+  },
+  { 
+    id: 'genshin', 
+    title: 'Genshin Impact', 
+    image: 'https://i.ytimg.com/vi/WvUxzNW0X4I/maxresdefault.jpg', 
+    genre: 'Action RPG' 
   },
   { 
     id: 'bg3', 
@@ -61,6 +133,24 @@ export const POPULAR_GAMES: Game[] = [
     title: 'Call of Duty: Black Ops 6', 
     image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2933620/page_bg_raw.jpg?t=1765489042', 
     genre: 'First-Person Shooter' 
+  },
+  { 
+    id: 'msfs', 
+    title: 'Microsoft Flight Simulator', 
+    image: 'https://i.ytimg.com/vi/TYqJALPVn0Y/maxresdefault.jpg', 
+    genre: 'Simulation' 
+  },
+  { 
+    id: 'ghost', 
+    title: 'Ghost of Tsushima', 
+    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2215430/header.jpg?t=1716301386', 
+    genre: 'Action Adventure' 
+  },
+  { 
+    id: 're4', 
+    title: 'Resident Evil 4', 
+    image: 'https://i.ytimg.com/vi/j5Xv2lM9wes/maxresdefault.jpg', 
+    genre: 'Action Horror' 
   },
 ];
 
