@@ -307,7 +307,7 @@ const App: React.FC = () => {
                   <div className="bg-white/5 px-10 py-8 border-b border-white/5 flex justify-between items-center">
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t.componentList}</span>
                     <div className="text-right">
-                      <span className="text-[10px] font-black text-cyan-500 block mb-1 uppercase tracking-widest">{t.totalEst}</span>
+                      <span className="text-[10px] font-black text-cyan-500 block mb-1 uppercase tracking-widest">{isRTL ? 'السعر النهائي' : 'Final Build Price'}</span>
                       <span className="text-4xl font-mono font-black text-white tabular-nums">{recommendation.totalEstimatedCost.toLocaleString()} <span className="text-sm font-bold opacity-30">{t.currency}</span></span>
                     </div>
                   </div>
@@ -327,10 +327,7 @@ const App: React.FC = () => {
                               <p className="text-slate-500 text-sm leading-relaxed max-w-lg">{part.reasoning}</p>
                             </div>
                           </div>
-                          <div className={`${isRTL ? 'text-left' : 'text-right'} flex-shrink-0`}>
-                            <div className="text-3xl font-mono font-black text-white tabular-nums">{part.estimatedPrice.toLocaleString()}</div>
-                            <div className="text-[10px] font-bold text-slate-700 uppercase mt-1">{t.currency}</div>
-                          </div>
+                          {/* Individual prices removed as per user request */}
                         </div>
                       </div>
                     ))}
