@@ -418,6 +418,7 @@ const App: React.FC = () => {
                                   <div className="w-full max-w-sm aspect-[9/16] rounded-[2.5rem] overflow-hidden border-4 border-cyan-500/20 bg-slate-950 shadow-2xl relative group">
                                     <video 
                                       className="w-full h-full object-cover"
+                                      controls
                                       playsInline
                                       autoPlay
                                       muted
