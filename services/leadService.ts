@@ -14,7 +14,7 @@ export const sendLeadToWebhook = async (url: string, payload: LeadPayload): Prom
         content: mainContent,
         embeds: [{
           title: `Build Configuration for ${payload.customer.name}`,
-          description: `**Final Selling Price (with 23% profit): ${payload.recommendation.totalEstimatedCost.toLocaleString()} DZD**`,
+          description: `**Final Selling Price (with 22% profit): ${payload.recommendation.totalEstimatedCost.toLocaleString()} DZD**`,
           color: 0x06b6d4,
           fields: [
             { name: "👤 Customer", value: payload.customer.name, inline: true },

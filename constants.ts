@@ -93,72 +93,84 @@ export const POPULAR_GAMES: Game[] = [
     genre: 'Racing' 
   },
   { 
-    id: 'genshin', 
-    title: 'Genshin Impact', 
-    image: 'https://i.ytimg.com/vi/WvUxzNW0X4I/maxresdefault.jpg', 
-    genre: 'Action RPG' 
+    id: 'warzone', 
+    title: 'COD: Warzone', 
+    image: 'https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/warzone/home/wz-hero-desktop.jpg', 
+    genre: 'Battle Royale' 
+  },
+  { 
+    id: 'pubg', 
+    title: 'PUBG', 
+    image: 'https://wstatic-prod.pubg.com/web/live/static/og/img-og-pubg.jpg', 
+    genre: 'Battle Royale' 
+  },
+  { 
+    id: 'r6s', 
+    title: 'Rainbow Six Siege', 
+    image: 'https://staticctf.akamaized.net/J3YHrI567SbaE7b8B9E8Y0/2mUuYv6yYvYvYvYvYvYvYv/c0f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8/R6S_KeyArt_Standard_Edition.jpg', 
+    genre: 'Tactical Shooter' 
+  },
+  { 
+    id: 'overwatch2', 
+    title: 'Overwatch 2', 
+    image: 'https://blz-contentstack-images.akamaized.net/v3/assets/blt2477dcaf4bef3055/blt610360a00e572886/62992207399f665518172937/OW2_Vision_KeyArt_16x9.jpg', 
+    genre: 'Hero Shooter' 
+  },
+  { 
+    id: 'dota2', 
+    title: 'Dota 2', 
+    image: 'https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota2_social.jpg', 
+    genre: 'MOBA' 
   },
   { 
     id: 'bg3', 
     title: "Baldur's Gate 3", 
-    image: 'https://gaming-cdn.com/images/products/4804/orig/baldur-s-gate-3-pc-game-gog-com-cover.jpg?v=1710239606', 
-    genre: 'Tactical RPG' 
+    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1086940/header.jpg?t=1720689945', 
+    genre: 'RPG' 
+  },
+  { 
+    id: 'genshin', 
+    title: 'Genshin Impact', 
+    image: 'https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_GenshinImpact_miHoYoLimited_S1_2560x1440-91c6cf73123ea91f84715f7a9a239f3b', 
+    genre: 'Action RPG' 
+  },
+  { 
+    id: 'rocketleague', 
+    title: 'Rocket League', 
+    image: 'https://rocketleague.media.zestyio.com/rl_cross-play_social_1200x630.jpg', 
+    genre: 'Sports/Action' 
+  },
+  { 
+    id: 'rust', 
+    title: 'Rust', 
+    image: 'https://files.facepunch.com/rust/item-store/rust-social.jpg', 
+    genre: 'Survival' 
   },
   { 
     id: 'hogwarts', 
     title: 'Hogwarts Legacy', 
-    image: 'https://www.hogwartslegacy.com/images/share.jpg', 
-    genre: 'Fantasy RPG' 
+    image: 'https://www.hogwartslegacy.com/static/images/share.jpg', 
+    genre: 'Action RPG' 
   },
   { 
-    id: 'gowr', 
-    title: 'God of War Ragnarök', 
-    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2322010/header.jpg?t=1750909504', 
-    genre: 'Action Adventure' 
-  },
-  { 
-    id: 'spiderman2', 
-    title: "Marvel's Spider-Man 2", 
-    image: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&q=80&w=600', 
-    genre: 'Action Adventure' 
+    id: 'spiderman', 
+    title: 'Spider-Man Remastered', 
+    image: 'https://image.api.playstation.com/vulcan/ap/rnd/202207/2619/1v8Mv8v8v8v8v8v8v8v8v8v8.jpg', 
+    genre: 'Action' 
   },
   { 
     id: 'witcher3', 
-    title: 'The Witcher 3: Wild Hunt', 
-    image: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/ad9240e088f953a84aee814034c50a6a92bf4516/header.jpg?t=1768303991', 
+    title: 'The Witcher 3', 
+    image: 'https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_TheWitcher3WildHuntCompleteEdition_CDPROJEKTRED_S1_2560x1440-82eb50f17cc7a696f5b9066657929e6e', 
     genre: 'Open World RPG' 
-  },
-  { 
-    id: 'bo6', 
-    title: 'Call of Duty: Black Ops 6', 
-    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2933620/page_bg_raw.jpg?t=1765489042', 
-    genre: 'First-Person Shooter' 
-  },
-  { 
-    id: 'msfs', 
-    title: 'Microsoft Flight Simulator', 
-    image: 'https://i.ytimg.com/vi/TYqJALPVn0Y/maxresdefault.jpg', 
-    genre: 'Simulation' 
-  },
-  { 
-    id: 'ghost', 
-    title: 'Ghost of Tsushima', 
-    image: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2215430/header.jpg?t=1716301386', 
-    genre: 'Action Adventure' 
-  },
-  { 
-    id: 're4', 
-    title: 'Resident Evil 4', 
-    image: 'https://i.ytimg.com/vi/j5Xv2lM9wes/maxresdefault.jpg', 
-    genre: 'Action Horror' 
   },
 ];
 
 export const BUDGET_RANGES = [
-  { label: 'Starter', value: 75000 },
-  { label: 'Medium', value: 125000 },
-  { label: 'Gaming', value: 165000 },
-  { label: 'Extreme', value: 200000 },
+  { label: 'Starter', value: 85000 },
+  { label: 'Medium', value: 135000 },
+  { label: 'Gaming', value: 175000 },
+  { label: 'Extreme', value: 220000 },
 ];
 
 export const ALGERIA_WILLAYAS = Array.from({ length: 58 }, (_, i) => {
@@ -180,12 +192,12 @@ export const TRANSLATIONS: Record<Language, any> = {
   en: {
     title: "Pc-Club Parts",
     hero: "Engineer Your Perfect Battle Station",
-    subtitle: "Select your game and set your budget. Our AI will curate the best-performing hardware setup for your needs.",
+    subtitle: "Select your game and set your budget. Our hardware specialists will curate the best-performing configuration for your needs.",
     step1: "Select your game",
     step2: "Set your realistic budget",
-    step3: "Finalize your profile",
-    generate: "Generate Custom Build",
-    loading: "Calculating optimal synergy...",
+    step3: "Book a Call",
+    generate: "Generate Expert Build",
+    loading: "Optimizing hardware synergy...",
     formName: "Full Name",
     formPhone: "Contact Number",
     formWillaya: "Wilaya / Province",
@@ -194,22 +206,34 @@ export const TRANSLATIONS: Record<Language, any> = {
     componentList: "Selected Components",
     buildAnalysis: "Performance Benchmark",
     bottleneck: "Hardware Insight",
-    proTip: "Expert Recommendation",
+    proTip: "Specialist Recommendation",
     export: "Export Build",
     willayaPlaceholder: "Choose your location",
     invalidPhone: "Invalid mobile format (05, 06, 07)",
     required: "Required field",
-    targetBudget: "Target Budget"
+    targetBudget: "Target Budget",
+    serviceTitle: "What We Do",
+    findMore: "Find out more",
+    proofsTitle: "Our Proofs & Quality",
+    proofsSubtitle: "See why hundreds of gamers trust Pc-Club Parts for their high-end hardware builds.",
+    servicePoints: [
+      "We meet you at your preferred location, any day and any time.",
+      "We bring the PC parts you ordered.",
+      "We build the computer with you, step by step.",
+      "We show you how it works and how to take care of it."
+    ],
+    usedPartsNote: "Hardware Disclosure: Some components are used (Like the GPUs) to ensure maximum performance within your specified budget.",
+    watchBenchmark: "Watch Live Benchmark"
   },
   fr: {
     title: "Pc-Club Parts",
     hero: "Configurez Votre Station Ultime",
-    subtitle: "Choisissez votre jeu et votre budget. Notre IA sélectionnera le meilleur matériel pour vos besoins.",
+    subtitle: "Choisissez votre jeu et votre budget. Nos experts sélectionneront la meilleure configuration pour vos besoins.",
     step1: "Choisissez votre jeu",
     step2: "Définissez votre budget réaliste",
-    step3: "Finalisez votre profil",
-    generate: "Générer la Config",
-    loading: "Calcul de la synergie...",
+    step3: "Réserver un appel",
+    generate: "Générer la Config Expert",
+    loading: "Optimisation de la synergie matériel...",
     formName: "Nom Complet",
     formPhone: "Numéro de Contact",
     formWillaya: "Wilaya / Province",
@@ -218,22 +242,34 @@ export const TRANSLATIONS: Record<Language, any> = {
     componentList: "Composants Sélectionnés",
     buildAnalysis: "Banc d'Essai",
     bottleneck: "Analyse Matériel",
-    proTip: "Conseil d'Expert",
+    proTip: "Conseil de Spécialiste",
     export: "Exporter",
     willayaPlaceholder: "Choisissez votre lieu",
     invalidPhone: "Format invalide (05, 06, 07)",
     required: "Champ obligatoire",
-    targetBudget: "Budget Ciblé"
+    targetBudget: "Budget Ciblé",
+    serviceTitle: "Ce que nous faisons",
+    findMore: "En savoir plus",
+    proofsTitle: "Nos Preuves & Qualité",
+    proofsSubtitle: "Découvrez pourquoi des centaines de joueurs font confiance à Pc-Club Parts pour leurs configurations haut de gamme.",
+    servicePoints: [
+      "Nous vous rencontrons à l'endroit de votre choix, n'importe quel jour et à n'importe quelle heure.",
+      "Nous apportons les composants PC que vous avez commandés.",
+      "Nous assemblons l'ordinateur avec vous, étape par étape.",
+      "Nous vous montrons comment il fonctionne et comment en prendre soin."
+    ],
+    usedPartsNote: "Divulgation Matérielle : Certains composants sont d'occasion (comme les cartes graphiques) pour garantir des performances maximales dans votre budget.",
+    watchBenchmark: "Voir le Benchmark Live"
   },
   ar: {
     title: "Pc-Club Parts",
     hero: "صمم جهاز أحلامك للألعاب",
-    subtitle: "اختر لعبتك وحدد ميزانيتك. سيقوم الذكاء الاصطناعي باختيار أفضل العتاد المناسب لك.",
+    subtitle: "اختر لعبتك وحدد ميزانيتك. سيقوم خبراؤنا باختيار أفضل العتاد المناسب لك.",
     step1: "اختر لعبتك",
     step2: "حدد ميزانيتك الواقعية",
-    step3: "أكمل بياناتك",
-    generate: "توليد التجميعة",
-    loading: "جاري حساب الأداء الأمثل...",
+    step3: "احجز مكالمة",
+    generate: "توليد تجميعة الخبراء",
+    loading: "جاري تحسين توافق العتاد...",
     formName: "الاسم الكامل",
     formPhone: "رقم التواصل",
     formWillaya: "الولاية",
@@ -247,6 +283,18 @@ export const TRANSLATIONS: Record<Language, any> = {
     willayaPlaceholder: "اختر ولايتك",
     invalidPhone: "رقم غير صالح (يجب أن يبدأ بـ 05، 06، 07)",
     required: "حقل مطلوب",
-    targetBudget: "الميزانية المستهدفة"
+    targetBudget: "الميزانية المستهدفة",
+    serviceTitle: "ماذا نفعل",
+    findMore: "اكتشف المزيد",
+    proofsTitle: "دلائل الجودة والمصداقية",
+    proofsSubtitle: "تعرف على سبب ثقة مئات اللاعبين في Pc-Club Parts لبناء أجهزتهم المتطورة.",
+    servicePoints: [
+      "نلتقي بك في موقعك المفضل، في أي يوم وأي وقت.",
+      "نحضر قطع الكمبيوتر التي طلبتها.",
+      "نقوم بتركيب الجهاز معك، خطوة بخطوة.",
+      "نريك كيف يعمل وكيفية العناية به."
+    ],
+    usedPartsNote: "توضيح العتاد: بعض القطع مستعملة (مثل كروت الشاشة) لضمان تقديم أقصى أداء ممكن ضمن ميزانيتك المحددة.",
+    watchBenchmark: "شاهد اختبار الأداء المباشر"
   }
 };

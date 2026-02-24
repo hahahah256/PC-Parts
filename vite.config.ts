@@ -11,6 +11,7 @@ export default defineConfig({
   },
   define: {
     'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
+    'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY),
     // Allows you to set a secret admin key in Vercel settings. Defaults to '1234'.
     'process.env.ADMIN_KEY': JSON.stringify(process.env.ADMIN_KEY || '1234')
   }
