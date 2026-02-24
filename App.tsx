@@ -418,14 +418,13 @@ const App: React.FC = () => {
                                   <div className="w-full max-w-sm aspect-[9/16] rounded-[2.5rem] overflow-hidden border-4 border-cyan-500/20 bg-slate-950 shadow-2xl relative group">
                                     <video 
                                       className="w-full h-full object-cover"
-                                      controls
                                       playsInline
                                       autoPlay
                                       muted
                                       loop
                                     >
                                       {/* The user's uploaded video should be placed here. Using a placeholder for now. */}
-                                      <source src="https://assets.mixkit.co/videos/preview/mixkit-gaming-pc-with-rgb-lights-in-a-dark-room-40243-large.mp4" type="video/mp4" />
+                                      <source src="/mriz.mp4" type="video/mp4" />
                                       Your browser does not support the video tag.
                                     </video>
                                     <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
