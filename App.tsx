@@ -451,7 +451,7 @@ const App: React.FC = () => {
                                       loop
                                     >
                                       {/* The user's uploaded video should be placed here. Using a placeholder for now. */}
-                                      <source src="https://assets.mixkit.co/videos/preview/mixkit-gaming-pc-with-rgb-lights-in-a-dark-room-40243-large.mp4" type="video/mp4" />
+                                      <source src="test.mp4" type="video/mp4" />
                                       Your browser does not support the video tag.
                                     </video>
                                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all pointer-events-none">
