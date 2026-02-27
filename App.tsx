@@ -22,6 +22,8 @@ const App: React.FC = () => {
   const [userContact, setUserContact] = useState<UserContact>({ name: '', phone: '', willaya: '' });
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof UserContact, string>>>({});
 
+  const [isBooked, setIsBooked] = useState(false);
+
   const t = useMemo(() => TRANSLATIONS[language], [language]);
   const isRTL = language === 'ar';
 
@@ -79,6 +81,7 @@ const App: React.FC = () => {
     setStatus(AppStatus.LOADING);
     setLoadingStep(0);
     setError(null);
+    setIsBooked(false);
     
     try {
       const result = await getPCRecommendation(selectedGame.title, budget, language, []);
@@ -106,11 +109,8 @@ const App: React.FC = () => {
     };
     
     sendLeadToWebhook(SYSTEM_WEBHOOK, newLead);
+    setIsBooked(true);
     setStatus(AppStatus.SUCCESS);
-    
-    // Open WhatsApp automatically after booking
-    const link = formatWhatsAppLink(SYSTEM_WHATSAPP, newLead, language);
-    window.open(link, '_blank');
   }, [userContact, selectedGame, recommendation, budget, language, validateForm]);
 
   const openWhatsApp = () => {
@@ -132,6 +132,29 @@ const App: React.FC = () => {
     const cpu = recommendation.parts.find(p => p.category.toLowerCase().includes('cpu'))?.name || "";
     const query = `${cpu} ${gpu} ${selectedGame.title} benchmark`;
     window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, '_blank');
+  };
+
+  const handleVideoClick = (video: HTMLVideoElement) => {
+    if (!video) return;
+    
+    video.muted = false;
+    
+    // Request fullscreen
+    if (video.requestFullscreen) {
+      video.requestFullscreen().catch(() => {});
+    } else if ((video as any).webkitRequestFullscreen) {
+      (video as any).webkitRequestFullscreen();
+    }
+    
+    // Handle the play promise to prevent "interrupted by pause" errors
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        if (error.name !== 'AbortError') {
+          console.error("Playback failed:", error);
+        }
+      });
+    }
   };
 
   const scrollToProofs = () => {
@@ -415,32 +438,51 @@ const App: React.FC = () => {
                                   </button>
                                 </div>
                                 <div className="flex justify-center">
-                                  <div className="w-full max-w-sm aspect-[9/16] rounded-[2.5rem] overflow-hidden border-4 border-cyan-500/20 bg-slate-950 shadow-2xl relative group">
+                                  <div 
+                                    className="w-full max-w-sm aspect-[9/16] rounded-[2.5rem] overflow-hidden border-4 border-cyan-500/20 bg-slate-950 shadow-2xl relative group cursor-pointer"
+                                    onClick={(e) => {
+                                      const video = e.currentTarget.querySelector('video');
+                                      if (video) handleVideoClick(video);
+                                    }}
+                                  >
                                     <video 
-                                      className="w-full h-full object-cover"
-                                      controls
+                                      className="w-full h-full object-cover pointer-events-none"
                                       playsInline
-                                      autoPlay
-                                      muted
                                       loop
                                     >
                                       {/* The user's uploaded video should be placed here. Using a placeholder for now. */}
-                                      <source src="/mriz.mp4" type="video/mp4" />
+                                      <source src="https://assets.mixkit.co/videos/preview/mixkit-gaming-pc-with-rgb-lights-in-a-dark-room-40243-large.mp4" type="video/mp4" />
                                       Your browser does not support the video tag.
                                     </video>
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all pointer-events-none">
+                                      <div className="w-20 h-20 rounded-full bg-cyan-500/80 flex items-center justify-center text-white shadow-2xl scale-90 group-hover:scale-100 transition-transform">
+                                        <svg className="w-10 h-10 translate-x-1" fill="currentColor" viewBox="0 0 24 24">
+                                          <path d="M8 5v14l11-7z" />
+                                        </svg>
+                                      </div>
+                                    </div>
                                     <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                   </div>
                                 </div>
                                 <div className="mt-8 flex justify-center">
-                                  <button 
-                                    onClick={() => setStatus(AppStatus.ONBOARDING)}
-                                    className="w-full max-w-sm py-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xl rounded-[2rem] shadow-2xl shadow-cyan-500/30 hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-4"
-                                  >
-                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                    {t.step3}
-                                  </button>
+                                  {isBooked ? (
+                                    <div className="w-full max-w-sm py-6 bg-emerald-500/10 border-2 border-emerald-500/20 text-emerald-400 font-black text-xl rounded-[2rem] flex items-center justify-center gap-4 animate-in zoom-in duration-500">
+                                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {isRTL ? 'تم إرسال الطلب بنجاح!' : 'Request Sent Successfully!'}
+                                    </div>
+                                  ) : (
+                                    <button 
+                                      onClick={() => setStatus(AppStatus.ONBOARDING)}
+                                      className="w-full max-w-sm py-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xl rounded-[2rem] shadow-2xl shadow-cyan-500/30 hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-4"
+                                    >
+                                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                      </svg>
+                                      {t.step3}
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
