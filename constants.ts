@@ -167,10 +167,10 @@ export const POPULAR_GAMES: Game[] = [
 ];
 
 export const BUDGET_RANGES = [
-  { label: 'Starter', value: 85000 },
-  { label: 'Medium', value: 135000 },
-  { label: 'Gaming', value: 175000 },
-  { label: 'Extreme', value: 220000 },
+  { label: 'Starter', value: 60000 },
+  { label: 'Medium', value: 110000 },
+  { label: 'Gaming', value: 160000 },
+  { label: 'Extreme', value: 200000 },
 ];
 
 export const ALGERIA_WILLAYAS = Array.from({ length: 58 }, (_, i) => {
@@ -216,6 +216,8 @@ export const TRANSLATIONS: Record<Language, any> = {
     findMore: "Find out more",
     proofsTitle: "Our Proofs & Quality",
     proofsSubtitle: "See why hundreds of gamers trust Pc-Club Parts for their high-end hardware builds.",
+    testimonialsTitle: "What Our Clients Say",
+    testimonialsSubtitle: "Real feedback from the Algerian gaming community.",
     servicePoints: [
       "We meet you at your preferred location, any day and any time.",
       "We bring the PC parts you ordered.",
@@ -252,6 +254,8 @@ export const TRANSLATIONS: Record<Language, any> = {
     findMore: "En savoir plus",
     proofsTitle: "Nos Preuves & Qualité",
     proofsSubtitle: "Découvrez pourquoi des centaines de joueurs font confiance à Pc-Club Parts pour leurs configurations haut de gamme.",
+    testimonialsTitle: "Ce que disent nos clients",
+    testimonialsSubtitle: "Retours réels de la communauté gaming algérienne.",
     servicePoints: [
       "Nous vous rencontrons à l'endroit de votre choix, n'importe quel jour et à n'importe quelle heure.",
       "Nous apportons les composants PC que vous avez commandés.",
@@ -288,6 +292,8 @@ export const TRANSLATIONS: Record<Language, any> = {
     findMore: "اكتشف المزيد",
     proofsTitle: "دلائل الجودة والمصداقية",
     proofsSubtitle: "تعرف على سبب ثقة مئات اللاعبين في Pc-Club Parts لبناء أجهزتهم المتطورة.",
+    testimonialsTitle: "ماذا يقول عملاؤنا",
+    testimonialsSubtitle: "آراء حقيقية من مجتمع اللاعبين في الجزائر.",
     servicePoints: [
       "نلتقي بك في موقعك المفضل، في أي يوم وأي وقت.",
       "نحضر قطع الكمبيوتر التي طلبتها.",

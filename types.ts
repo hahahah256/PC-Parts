@@ -18,6 +18,10 @@ export interface PCRecommendation {
   summary: string;
   totalEstimatedCost: number;
   bottleneckAnalysis: string;
+  gamingCaseUpgrade?: {
+    name: string;
+    additionalCost: number;
+  };
 }
 
 export interface Game {

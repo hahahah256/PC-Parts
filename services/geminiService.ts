@@ -11,17 +11,20 @@ MANDATORY INVENTORY & BASE COST (DA) - USE ONLY THESE EXACT PRICES (NUMBERS ONLY
 - PSU: PSU 450W: 4000, Antec 550w: 6000, Gamemax 600w: 6500.
 - Core: 16GB DDR4: 14000, SSD 256GB: 6000, SSD 500GB: 12000.
 - Motherboard: Basic: 11000, Mid: 18000. 
-- Case: Gaming Case: 8000.
+- Case: Normal Case: 4000, Gaming Case: 8000.
 
 CALCULATION RULES:
 1. Sum the Base Cost of all selected parts.
-2. Final Selling Price = (Total Base Cost) * 1.22.
-3. The "totalEstimatedCost" MUST be this Final Selling Price.
-4. Ensure the Final Selling Price is within the user's budget.
+2. ALWAYS include "Normal Case" (4000 DA) in the main "parts" list. NEVER include "Gaming Case" in the main "parts" list.
+3. Final Selling Price = (Total Base Cost) * 1.22.
+4. The "totalEstimatedCost" MUST be this Final Selling Price.
+5. Ensure the Final Selling Price is within the user's budget.
 
 STRICT CONTENT RULES:
 - Output MUST be valid JSON.
 - estimatedPrice and totalEstimatedCost MUST be pure numbers (no commas, no "DA").
+- ALWAYS provide a "gamingCaseUpgrade" object in the root of the JSON. 
+- The "gamingCaseUpgrade" should have "name": "Gaming Case Upgrade (RGB + Glass)", and "additionalCost": 4880 (which is (8000-4000)*1.22).
 - NEVER mention prices, margins, profit, or currency values in "reasoning", "summary", or "bottleneckAnalysis".
 - FOCUS ONLY on technical synergy and performance.
 - DO NOT use the term "AI".
@@ -76,9 +79,17 @@ export const getPCRecommendation = async (
           },
           summary: { type: Type.STRING },
           totalEstimatedCost: { type: Type.NUMBER },
-          bottleneckAnalysis: { type: Type.STRING }
+          bottleneckAnalysis: { type: Type.STRING },
+          gamingCaseUpgrade: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              additionalCost: { type: Type.NUMBER }
+            },
+            required: ["name", "additionalCost"]
+          }
         },
-        required: ["parts", "performance", "summary", "totalEstimatedCost", "bottleneckAnalysis"]
+        required: ["parts", "performance", "summary", "totalEstimatedCost", "bottleneckAnalysis", "gamingCaseUpgrade"]
       }
     }
   });
