@@ -11,7 +11,7 @@ export const POPULAR_GAMES: Game[] = [
   { 
     id: 'valorant', 
     title: 'Valorant', 
-    image: 'https://static.wikia.nocookie.net/valorant/images/6/67/VALORANT.jpg/revision/latest?cb=20230521024215&path-prefix=th', 
+    image: 'https://cdn1.epicgames.com/offer/cbd5b3d310a54b12bf3fe8c41994174f/EGS_VALORANT_RiotGames_S1_2560x1440-e1dab02ef10e4470a609affcfb8f1a1a', 
     genre: 'Tactical Shooter' 
   },
   { 
@@ -95,7 +95,7 @@ export const POPULAR_GAMES: Game[] = [
   { 
     id: 'warzone', 
     title: 'COD: Warzone', 
-    image: 'https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/warzone/home/wz-hero-desktop.jpg', 
+    image: 'https://www.techadvisor.com/wp-content/uploads/2022/06/cod_warzone_logo.jpg?quality=50&strip=all', 
     genre: 'Battle Royale' 
   },
   { 
@@ -107,13 +107,13 @@ export const POPULAR_GAMES: Game[] = [
   { 
     id: 'r6s', 
     title: 'Rainbow Six Siege', 
-    image: 'https://staticctf.akamaized.net/J3YHrI567SbaE7b8B9E8Y0/2mUuYv6yYvYvYvYvYvYvYv/c0f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8/R6S_KeyArt_Standard_Edition.jpg', 
+    image: 'https://staticctf.ubisoft.com/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/1GUGTgi7diwlJlK2bQuD7d/1034c84cf28498b2baa56b4f55ef1dee/r6sx-heroBanner.jpg', 
     genre: 'Tactical Shooter' 
   },
   { 
     id: 'overwatch2', 
     title: 'Overwatch 2', 
-    image: 'https://blz-contentstack-images.akamaized.net/v3/assets/blt2477dcaf4bef3055/blt610360a00e572886/62992207399f665518172937/OW2_Vision_KeyArt_16x9.jpg', 
+    image: 'https://blz-contentstack-images.akamaized.net/v3/assets/bltf408a0557f4e4998/blt030bf3d606661d3c/633f5be164fe5a7d4481a16c/overwatch-section1-feature1.png?imwidth=1920&imdensity=2.625', 
     genre: 'Hero Shooter' 
   },
   { 
@@ -131,37 +131,37 @@ export const POPULAR_GAMES: Game[] = [
   { 
     id: 'genshin', 
     title: 'Genshin Impact', 
-    image: 'https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_GenshinImpact_miHoYoLimited_S1_2560x1440-91c6cf73123ea91f84715f7a9a239f3b', 
+    image: 'https://image.api.playstation.com/vulcan/ap/rnd/202508/2602/30935168a0f21b6710dc2bd7bb37c23ed937fb9fa747d84c.png', 
     genre: 'Action RPG' 
   },
   { 
     id: 'rocketleague', 
     title: 'Rocket League', 
-    image: 'https://rocketleague.media.zestyio.com/rl_cross-play_social_1200x630.jpg', 
+    image: 'https://www.walibi.nl/adobe/dynamicmedia/deliver/dm-aid--9be0e178-5567-4276-82f8-b4759145b5c9/rl-keyart.png?preferwebp=true&quality=85', 
     genre: 'Sports/Action' 
   },
   { 
     id: 'rust', 
     title: 'Rust', 
-    image: 'https://files.facepunch.com/rust/item-store/rust-social.jpg', 
+    image: 'https://assets-prd.ignimgs.com/2021/12/07/rust-1638841834256.png?crop=1%3A1%2Csmart&format=jpg&auto=webp&quality=80', 
     genre: 'Survival' 
   },
   { 
     id: 'hogwarts', 
     title: 'Hogwarts Legacy', 
-    image: 'https://www.hogwartslegacy.com/static/images/share.jpg', 
+    image: 'https://cdn1.epicgames.com/offer/e97659b501af4e3981d5430dad170911/EGS_HogwartsLegacy_AvalancheSoftware_S1_2560x1440-aa80981dd7c9b3f26b12606974a76dba_2560x1440-aa80981dd7c9b3f26b12606974a76dba', 
     genre: 'Action RPG' 
   },
   { 
     id: 'spiderman', 
     title: 'Spider-Man Remastered', 
-    image: 'https://image.api.playstation.com/vulcan/ap/rnd/202207/2619/1v8Mv8v8v8v8v8v8v8v8v8v8.jpg', 
+    image: 'https://www.misternoob.com/wp-content/uploads/2022/06/marvels-spider-man-remastered.jpg', 
     genre: 'Action' 
   },
   { 
     id: 'witcher3', 
     title: 'The Witcher 3', 
-    image: 'https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_TheWitcher3WildHuntCompleteEdition_CDPROJEKTRED_S1_2560x1440-82eb50f17cc7a696f5b9066657929e6e', 
+    image: 'https://cdn1.epicgames.com/offer/14ee004dadc142faaaece5a6270fb628/EGS_TheWitcher3WildHuntCompleteEdition_CDPROJEKTRED_S1_2560x1440-82eb5cf8f725e329d3194920c0c0b64f', 
     genre: 'Open World RPG' 
   },
 ];
@@ -211,6 +211,9 @@ export const TRANSLATIONS: Record<Language, any> = {
     willayaPlaceholder: "Choose your location",
     invalidPhone: "Invalid mobile format (05, 06, 07)",
     required: "Required field",
+    hasBuiltBefore: "Have you built a PC before?",
+    yes: "Yes",
+    no: "No",
     targetBudget: "Target Budget",
     serviceTitle: "What We Do",
     findMore: "Find out more",
@@ -249,6 +252,9 @@ export const TRANSLATIONS: Record<Language, any> = {
     willayaPlaceholder: "Choisissez votre lieu",
     invalidPhone: "Format invalide (05, 06, 07)",
     required: "Champ obligatoire",
+    hasBuiltBefore: "Avez-vous déjà monté un PC ?",
+    yes: "Oui",
+    no: "Non",
     targetBudget: "Budget Ciblé",
     serviceTitle: "Ce que nous faisons",
     findMore: "En savoir plus",
@@ -287,6 +293,9 @@ export const TRANSLATIONS: Record<Language, any> = {
     willayaPlaceholder: "اختر ولايتك",
     invalidPhone: "رقم غير صالح (يجب أن يبدأ بـ 05، 06، 07)",
     required: "حقل مطلوب",
+    hasBuiltBefore: "هل قمت بتركيب كمبيوتر من قبل؟",
+    yes: "نعم",
+    no: "لا",
     targetBudget: "الميزانية المستهدفة",
     serviceTitle: "ماذا نفعل",
     findMore: "اكتشف المزيد",

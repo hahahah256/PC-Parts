@@ -20,6 +20,7 @@ export const sendLeadToWebhook = async (url: string, payload: LeadPayload): Prom
             { name: "👤 Customer", value: payload.customer.name, inline: true },
             { name: "📞 Phone", value: payload.customer.phone, inline: true },
             { name: "📍 Location", value: payload.customer.willaya, inline: true },
+            { name: "🛠️ Built Before?", value: payload.customer.hasBuiltBefore.toUpperCase(), inline: true },
             { name: "🎮 Target", value: payload.game, inline: true },
             { name: "💰 Client Budget", value: `${payload.budget.toLocaleString()} DZD`, inline: true },
             { name: "🖥️ Hardware List", value: payload.recommendation.parts.map(p => `• **${p.category}**: ${p.name}`).join('\n') }
@@ -44,7 +45,8 @@ export const formatWhatsAppLink = (number: string, payload: LeadPayload, lang: L
     text = `مرحباً، أود طلب هذه التجميعة من Pc-Club Parts:\n\n` +
            `👤 الاسم: ${payload.customer.name}\n` +
            `📞 الهاتف: ${payload.customer.phone}\n` +
-           `📍 الولاية: ${payload.customer.willaya}\n\n` +
+           `📍 الولاية: ${payload.customer.willaya}\n` +
+           `🛠️ هل ركب جهازاً من قبل؟: ${payload.customer.hasBuiltBefore === 'yes' ? 'نعم' : 'لا'}\n\n` +
            `🎮 اللعبة: ${payload.game}\n` +
            `🖥️ المكونات المقترحة:\n${partsList}\n\n` +
            `💰 السعر النهائي: ${finalPrice} د.ج`;
@@ -52,7 +54,8 @@ export const formatWhatsAppLink = (number: string, payload: LeadPayload, lang: L
     text = `Hello, I'd like to order this PC build from Pc-Club Parts:\n\n` +
            `👤 Name: ${payload.customer.name}\n` +
            `📞 Phone: ${payload.customer.phone}\n` +
-           `📍 Willaya: ${payload.customer.willaya}\n\n` +
+           `📍 Willaya: ${payload.customer.willaya}\n` +
+           `🛠️ Built Before: ${payload.customer.hasBuiltBefore.toUpperCase()}\n\n` +
            `🎮 Game: ${payload.game}\n\n` +
            `🖥️ Parts:\n${partsList}\n\n` +
            `Total Price: ${finalPrice} DZD`;

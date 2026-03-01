@@ -7,8 +7,8 @@ import { sendLeadToWebhook, formatWhatsAppLink } from './services/leadService';
 import { GameCard } from './components/GameCard';
 import { PerformanceChart } from './components/PerformanceChart';
 
-const SYSTEM_WEBHOOK = "https://discord.com/api/webhooks/12123456789/dummy-key"; 
-const SYSTEM_WHATSAPP = "213550000000"; 
+const SYSTEM_WEBHOOK = import.meta.env.VITE_DISCORD_WEBHOOK_URL || ""; 
+const SYSTEM_WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || "213550000000"; 
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   const [loadingStep, setLoadingStep] = useState(0);
-  const [userContact, setUserContact] = useState<UserContact>({ name: '', phone: '', willaya: '' });
+  const [userContact, setUserContact] = useState<UserContact>({ name: '', phone: '', willaya: '', hasBuiltBefore: '' });
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof UserContact, string>>>({});
 
   const t = useMemo(() => TRANSLATIONS[language], [language]);
@@ -69,6 +69,7 @@ const App: React.FC = () => {
       errors.phone = t.invalidPhone;
     }
     if (!userContact.willaya) errors.willaya = t.required;
+    if (!userContact.hasBuiltBefore) errors.hasBuiltBefore = t.required;
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -97,7 +98,10 @@ const App: React.FC = () => {
         recommendation: result,
         timestamp: new Date().toLocaleString()
       };
-      sendLeadToWebhook(SYSTEM_WEBHOOK, newLead);
+      
+      sendLeadToWebhook(SYSTEM_WEBHOOK, newLead).then(success => {
+        if (!success) console.warn("Discord Webhook failed to send. Check your VITE_DISCORD_WEBHOOK_URL.");
+      });
       
       setStatus(AppStatus.SUCCESS);
       
@@ -236,6 +240,32 @@ const App: React.FC = () => {
                     ))}
                   </select>
                   {formErrors.willaya && <p className="text-red-500 text-[10px] mt-1 uppercase font-bold">{formErrors.willaya}</p>}
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">{t.hasBuiltBefore}</label>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => setUserContact({...userContact, hasBuiltBefore: 'yes'})}
+                      className={`flex-1 py-4 rounded-2xl border-2 font-black transition-all ${
+                        userContact.hasBuiltBefore === 'yes' 
+                        ? 'bg-cyan-500/10 border-cyan-500 text-cyan-400' 
+                        : 'bg-slate-950 border-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {t.yes}
+                    </button>
+                    <button 
+                      onClick={() => setUserContact({...userContact, hasBuiltBefore: 'no'})}
+                      className={`flex-1 py-4 rounded-2xl border-2 font-black transition-all ${
+                        userContact.hasBuiltBefore === 'no' 
+                        ? 'bg-cyan-500/10 border-cyan-500 text-cyan-400' 
+                        : 'bg-slate-950 border-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {t.no}
+                    </button>
+                  </div>
+                  {formErrors.hasBuiltBefore && <p className="text-red-500 text-[10px] mt-1 uppercase font-bold">{formErrors.hasBuiltBefore}</p>}
                 </div>
               </div>
 

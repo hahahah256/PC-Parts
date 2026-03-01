@@ -46,6 +46,7 @@ export interface UserContact {
   name: string;
   phone: string;
   willaya: string;
+  hasBuiltBefore: 'yes' | 'no' | '';
 }
 
 export interface StockItem {
