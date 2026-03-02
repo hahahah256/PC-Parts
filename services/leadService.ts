@@ -29,9 +29,15 @@ export const sendLeadToWebhook = async (url: string, payload: LeadPayload): Prom
         }]
       })
     });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Webhook failed with status ${response.status}: ${errorText}`);
+    }
+    
     return response.ok;
   } catch (error) {
-    console.error("Webhook error:", error);
+    console.error("Webhook network error:", error);
     return false;
   }
 };

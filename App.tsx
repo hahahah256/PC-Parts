@@ -7,7 +7,7 @@ import { sendLeadToWebhook, formatWhatsAppLink } from './services/leadService';
 import { GameCard } from './components/GameCard';
 import { PerformanceChart } from './components/PerformanceChart';
 
-const SYSTEM_WEBHOOK = import.meta.env.VITE_DISCORD_WEBHOOK_URL || ""; 
+const SYSTEM_WEBHOOK = import.meta.env.VITE_DISCORD_WEBHOOK_URL || "https://discord.com/api/webhooks/1473039361422659615/kcLbgEL1YJr-sFKmmsMkw07Zy9Nf2wraYAAfnyvrjKoBS5U9GkNamgbuuBkL8jIT9Ct-"; 
 const SYSTEM_WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || "213796750613"; 
 
 const App: React.FC = () => {
