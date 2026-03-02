@@ -19,6 +19,9 @@ CALCULATION RULES:
 3. Final Selling Price = (Total Base Cost) * 1.22.
 4. The "totalEstimatedCost" MUST be this Final Selling Price.
 5. Ensure the Final Selling Price is within the user's budget.
+6. HARDWARE SELECTION PRIORITIES:
+   - Prioritize NVIDIA GPUs (GTX/RTX series) for most builds.
+   - EXCEPTION: Prioritize the AMD RX 580 (4GB or 8GB) as the primary choice for budget-focused builds where it provides better value than entry-level NVIDIA cards.
 
 STRICT CONTENT RULES:
 - Output MUST be valid JSON.
