@@ -8,7 +8,7 @@ import { GameCard } from './components/GameCard';
 import { PerformanceChart } from './components/PerformanceChart';
 
 const SYSTEM_WEBHOOK = import.meta.env.VITE_DISCORD_WEBHOOK_URL || ""; 
-const SYSTEM_WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || "213550000000"; 
+const SYSTEM_WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || "213796750613"; 
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
@@ -100,7 +100,14 @@ const App: React.FC = () => {
       };
       
       sendLeadToWebhook(SYSTEM_WEBHOOK, newLead).then(success => {
-        if (!success) console.warn("Discord Webhook failed to send. Check your VITE_DISCORD_WEBHOOK_URL.");
+        if (!success) {
+          console.error("❌ Discord Webhook failed to send.");
+          if (!SYSTEM_WEBHOOK) {
+            console.warn("⚠️ VITE_DISCORD_WEBHOOK_URL is not set in environment variables.");
+          }
+        } else {
+          console.log("✅ Lead successfully sent to Discord.");
+        }
       });
       
       setStatus(AppStatus.SUCCESS);
